@@ -1,14 +1,27 @@
 #!/bin/bash
 
-# Add Grafana APT repository
-sudo apt-get install -y software-properties-common wget
-wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
-echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+# -------------------------------
+# Grafana Installation Script
+# Target OS: Ubuntu 20.04
+# -------------------------------
 
-# Install Grafana
-sudo apt-get update
+echo "====> [1/5] Updating packages and installing dependencies..."
+sudo apt-get update -y
+sudo apt-get install -y software-properties-common wget apt-transport-https
+
+echo "====> [2/5] Adding Grafana APT repository..."
+sudo wget -q -O /usr/share/keyrings/grafana.key https://apt.grafana.com/gpg.key
+echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+
+echo "====> [3/5] Installing Grafana..."
+sudo apt-get update -y
 sudo apt-get install -y grafana
 
-# Start and enable Grafana
+echo "====> [4/5] Enabling and starting Grafana service..."
 sudo systemctl enable grafana-server
 sudo systemctl start grafana-server
+
+echo "====> [5/5] Allowing port 3000 through firewall..."
+sudo ufw allow 3000/tcp
+
+echo "====> ✅ Grafana installation completed. Access it via http://<your-vm-ip>:3000"
